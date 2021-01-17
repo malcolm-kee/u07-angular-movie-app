@@ -1,12 +1,11 @@
-import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-
+import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { catchError, map, tap, timestamp } from 'rxjs/operators';
+import { catchError, tap } from 'rxjs/operators';
+// ************    Remove this import if you've cloned the project     ************ //
+import { environment } from "../environments/environment";
 import { Movie } from './movie';
 
-// ************    Remove this import if you've cloned the project     ************ //
-import { environment } from "../environments/environment.prod";
 
 @Injectable({
   providedIn: 'root'

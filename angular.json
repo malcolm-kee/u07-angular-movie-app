@@ -142,7 +142,7 @@
   "defaultProject": "u07-angular-movie-app",
   "schematics": {
     "@schematics/angular:component": {
-      "styleext": "scss"
+      "style": "scss"
     }
   }
 }

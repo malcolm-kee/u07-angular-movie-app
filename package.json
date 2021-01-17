@@ -1,6 +1,6 @@
 {
-  "name": "u07-angular-movie-app",
-  "version": "0.0.0",
+  "name": "react-in-angular-movie-app",
+  "version": "0.0.1",
   "scripts": {
     "ng": "ng",
     "start": "ng serve",

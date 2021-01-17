@@ -1,92 +1,105 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
-// ************    Remove this import if you've cloned the project     ************ //
-import { environment } from "../environments/environment";
+import { catchError } from 'rxjs/operators';
+import { environment } from '../environments/environment';
 import { Movie } from './movie';
 
-
+const nextMonth = (function () {
+  const date = new Date();
+  date.setMonth(date.getMonth() + 1);
+  return date;
+})();
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ApiService {
-
-  // ************    Replace the key value with your own key     ************ //
-  // private key = '?api_key=YourKey';
-  private baseUrl = 'https://api.themoviedb.org/3';  // URL to web API
+  private baseUrl = environment.apiBase; // URL to web API
   // ************  https://www.themoviedb.org/documentation/api  ************ //
 
-  private key = environment.apiKey; // Private API key
+  private apiKey = environment.apiKey;
   // private baseUrl = environment.apiBase;  // URL to web API
 
-  httpOptions = {
-    headers: new HttpHeaders({ 'Content-Type': 'application/json' })
-  };
-
-  constructor(
-    private http: HttpClient
-  ) { }
+  constructor(private http: HttpClient) {}
 
   // ToDo Make date dynamic
   // Returns list of upcoming releases this year (hard coded to 2020-12-30)
-  getLatestReleases(): Observable<any[]> {
-
-    return this.http.get<any[]>(`${this.baseUrl}/discover/movie${this.key}&sort_by=release_date.desc&primary_release_date.lte=2020-12-30&include_adult=false&include_video=false&page=1`)
-      .pipe(
-        tap(_ => console.log('fetched trending')),
-        catchError(this.handleError<any[]>('getLatestReleases', []))
-      );
+  getLatestReleases() {
+    return this.http.get<ListResult<Movie>>(`${this.baseUrl}/discover/movie`, {
+      params: {
+        api_key: this.apiKey,
+        sort_by: 'release_date.desc',
+        'primary_release_date.lte': `${nextMonth.getFullYear()}-${(
+          nextMonth.getMonth() + 1
+        )
+          .toString()
+          .padStart(2, '0')}-01`,
+        include_adult: 'false',
+        include_video: 'false',
+        page: '1',
+      },
+    });
   }
 
   // Returns list of trending movies 20/page - 1000 pages
-  getTrending(page: number): Observable<Movie[]> {
-    console.log(`getTrending page: ${page}`);
-    return this.http.get<Movie[]>(`${this.baseUrl}/trending/movie/week${this.key}&page=${page}`)
-      .pipe(
-        tap(_ => console.log('fetched trending')),
-        catchError(this.handleError<Movie[]>('getTrending', []))
-      );
+  getTrending(page: number) {
+    return this.http.get<ListResult<Movie>>(
+      `${this.baseUrl}/trending/movie/week`,
+      {
+        params: {
+          api_key: this.apiKey,
+          page: String(page),
+        },
+      }
+    );
   }
 
   // Returns list of popular movies 20/page - 500 pages
-  getPopular(page: number): Observable<Movie[]> {
-    console.log(`getPopular page: ${page}`);
-
-    return this.http.get<Movie[]>(`${this.baseUrl}/movie/popular${this.key}&page=${page}`)
-      .pipe(
-        tap(_ => console.log('fetched popular')),
-        catchError(this.handleError<Movie[]>('getPopular', []))
-      );
+  getPopular(page: number) {
+    return this.http.get<ListResult<Movie>>(`${this.baseUrl}/movie/popular`, {
+      params: {
+        api_key: this.apiKey,
+        page: String(page),
+      },
+    });
   }
 
   // Return details of a movie
   getMovieDetails(id: number): Observable<Movie[]> {
     console.log(`getMovieDetails id: ${id}`);
-    return this.http.get<Movie[]>(`${this.baseUrl}/movie/${id}${this.key}&append_to_response=credits`)
-      .pipe(
-        tap(_ => console.log('fetched movie details')),
-        catchError(this.handleError<Movie[]>('getMovieDetails', []))
-      );
+    return this.http
+      .get<Movie[]>(`${this.baseUrl}/movie/${id}`, {
+        params: {
+          api_key: this.apiKey,
+          append_to_response: 'credits',
+        },
+      })
+      .pipe(catchError(this.handleError<Movie[]>('getMovieDetails', [])));
   }
 
   // Return details of a person
   getPeopleDetails(id: number): Observable<any[]> {
     console.log(`getMovieDetails id: ${id}`);
-    return this.http.get<any[]>(`${this.baseUrl}/person/${id}${this.key}&append_to_response=combined_credits`)
-      .pipe(
-        tap(_ => console.log('fetched person details')),
-        catchError(this.handleError<any[]>('getPersonDetails', []))
-      );
+    return this.http
+      .get<any[]>(`${this.baseUrl}/person/${id}`, {
+        params: {
+          api_key: this.apiKey,
+          append_to_response: 'credits',
+        },
+      })
+      .pipe(catchError(this.handleError<any[]>('getPersonDetails', [])));
   }
 
   // Return details of a tv show
   getTvDetails(id: number): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/tv/${id}${this.key}&append_to_response=credits`)
-      .pipe(
-        tap(_ => console.log('fetched tv details')),
-        catchError(this.handleError<any[]>('getTvDetails', []))
-      );
+    return this.http
+      .get<any[]>(`${this.baseUrl}/tv/${id}`, {
+        params: {
+          api_key: this.apiKey,
+          append_to_response: 'credits',
+        },
+      })
+      .pipe(catchError(this.handleError<any[]>('getTvDetails', [])));
   }
 
   /* GET Movies, tv-series and people that contains search term */
@@ -94,12 +107,14 @@ export class ApiService {
     if (!term.trim()) {
       return of([]);
     }
-    return this.http.get<any>(`${this.baseUrl}/search/multi/${this.key}&query=${term}`).pipe(
-      tap(x => x.length ?
-        console.log(`found results matching "${term}"`) :
-        console.log(`no results matching "${term}"`)),
-      catchError(this.handleError<any>('searchMulti', []))
-    );
+    return this.http
+      .get<any>(`${this.baseUrl}/search/multi`, {
+        params: {
+          api_key: this.apiKey,
+          query: term,
+        },
+      })
+      .pipe(catchError(this.handleError<any>('searchMulti', [])));
   }
 
   /**
@@ -110,7 +125,6 @@ export class ApiService {
    */
   private handleError<T>(operation = 'operation', result?: T) {
     return (error: any): Observable<T> => {
-
       // TODO: send the error to remote logging infrastructure
       console.error(error); // log to console instead
 
@@ -121,5 +135,11 @@ export class ApiService {
       return of(result as T);
     };
   }
+}
 
+export interface ListResult<Type> {
+  page: number;
+  results: Type[];
+  total_pages: number;
+  total_results: number;
 }

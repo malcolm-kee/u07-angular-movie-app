@@ -5,7 +5,7 @@
 export const environment = {
   production: false,
   apiBase: 'https://api.themoviedb.org/3',
-  apiKey: '?api_key=a460784a8c5d04c46594768a48309ba0'
+  apiKey: 'a460784a8c5d04c46594768a48309ba0',
 };
 
 /*
@@ -15,4 +15,4 @@ export const environment = {
  * This import should be commented out in production mode because it will have a negative impact
  * on performance if an error is thrown.
  */
-import 'zone.js/dist/zone-error';  // Included with Angular CLI.
+import 'zone.js/dist/zone-error'; // Included with Angular CLI.

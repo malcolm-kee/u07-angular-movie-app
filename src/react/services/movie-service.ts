@@ -29,6 +29,17 @@ export const getLatestReleases = () => {
     .then((res) => res.data);
 };
 
+export const getMovieDetails = (id: string) => {
+  return axios
+    .get<Movie>(`${baseUrl}/movie/${id}`, {
+      params: {
+        api_key: apiKey,
+        append_to_response: 'credits',
+      },
+    })
+    .then((res) => res.data);
+};
+
 export interface ListResult<Type> {
   page: number;
   results: Type[];

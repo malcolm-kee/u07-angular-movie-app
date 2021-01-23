@@ -4,8 +4,12 @@ export interface Movie {
   title: string;
   tagline: string;
   overview: string;
-  genres: string;
+  genres: Array<{
+    name: string;
+  }>;
   poster_path: string;
+  backdrop_path: string;
+  release_date: string;
   runtime: number;
   vote_average: number;
 }

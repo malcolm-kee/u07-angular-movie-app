@@ -1,16 +1,12 @@
 import * as React from 'react';
-import { Movie } from 'src/app/movie';
-import { getMovieDetails } from 'src/react/services/movie-service';
+import { useMovieDetails } from 'src/react/queries/movie.queries';
 
 export interface MovieDetailsProps {
   id: string;
 }
 
 export const MovieDetails = (props: MovieDetailsProps) => {
-  const [data, setData] = React.useState<Movie | undefined>(undefined);
-  React.useEffect(() => {
-    getMovieDetails(props.id).then((res) => setData(res));
-  }, []);
+  const { data } = useMovieDetails(props.id);
 
   if (!data) {
     return null;
@@ -53,7 +49,7 @@ export const MovieDetails = (props: MovieDetailsProps) => {
           Vote average: <strong>{data.vote_average}</strong>
         </p>
 
-        {data.genres.length > 0 && (
+        {data.genres && data.genres.length > 0 && (
           <div>
             <h3 className="h3-responsive">Genres:</h3>
             <div>

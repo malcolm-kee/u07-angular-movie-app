@@ -1,18 +1,9 @@
 import * as React from 'react';
-import { Movie } from 'src/app/movie';
-import {
-  getLatestReleases,
-  ListResult,
-} from 'src/react/services/movie-service';
 import { Link } from 'src/react/modules/routing/link';
+import { useLatestReleases } from 'src/react/queries/movie.queries';
 
 export const Home = () => {
-  const [data, setData] = React.useState<ListResult<Movie> | undefined>(
-    undefined
-  );
-  React.useEffect(() => {
-    getLatestReleases().then((res) => setData(res));
-  }, []);
+  const { data } = useLatestReleases();
 
   return (
     <>
@@ -27,7 +18,10 @@ export const Home = () => {
       {data && (
         <div className="row">
           {data.results.map((movie) => (
-            <div className="col-4 col-md-4 col-lg-3 my-3 px-2 px-md-4">
+            <div
+              className="col-4 col-md-4 col-lg-3 my-3 px-2 px-md-4"
+              key={movie.id}
+            >
               {movie.poster_path ? (
                 <Link className="view overlay zoom" to={`/movie/${movie.id}`}>
                   <img

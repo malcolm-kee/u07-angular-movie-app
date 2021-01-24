@@ -11,10 +11,10 @@
       (input)="search(searchBox.value)"
     />
     <!-- Search results -->
-    <ul class="search-result pl-0 w-100">
+    <ul class="search-result pl-0 w-100" *ngIf="query$ | async as query">
       <li
         class="hide-item list-group-item p-1"
-        *ngFor="let result of (query$ | async).results | slice: 0:15"
+        *ngFor="let result of query.results | slice: 0:15"
       >
         <!-- If it's a movie -->
         <div *ngIf="result.media_type == 'movie'">

@@ -65,16 +65,15 @@ export class ApiService {
   }
 
   // Return details of a movie
-  getMovieDetails(id: number): Observable<Movie[]> {
-    console.log(`getMovieDetails id: ${id}`);
+  getMovieDetails(id: number): Observable<Movie> {
     return this.http
-      .get<Movie[]>(`${this.baseUrl}/movie/${id}`, {
+      .get<Movie>(`${this.baseUrl}/movie/${id}`, {
         params: {
           api_key: this.apiKey,
           append_to_response: 'credits',
         },
       })
-      .pipe(catchError(this.handleError<Movie[]>('getMovieDetails', [])));
+      .pipe(catchError(this.handleError<Movie>('getMovieDetails', undefined)));
   }
 
   // Return details of a person
@@ -103,12 +102,17 @@ export class ApiService {
   }
 
   /* GET Movies, tv-series and people that contains search term */
-  searchMulti(term: string): Observable<any> {
+  searchMulti(term: string): Observable<ListResult<Movie>> {
     if (!term.trim()) {
-      return of([]);
+      return of({
+        results: [],
+        page: 0,
+        total_pages: 0,
+        total_results: 0,
+      });
     }
     return this.http
-      .get<any>(`${this.baseUrl}/search/multi`, {
+      .get<ListResult<Movie>>(`${this.baseUrl}/search/multi`, {
         params: {
           api_key: this.apiKey,
           query: term,
